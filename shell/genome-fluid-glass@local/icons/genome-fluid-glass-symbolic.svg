@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Fluid glass droplet: pale rim, bright top-left specular -->
+  <path d="M8 1.5 C8 1.5 2.5 8 2.5 10.5 a5.5 5.5 0 0 0 11 0 C13.5 8 8 1.5 8 1.5 Z"
+        fill="none" stroke="white" stroke-opacity="0.9" stroke-width="1.4"/>
+  <path d="M4.6 10.2 a3.4 3.4 0 0 0 2.6 3.1"
+        fill="none" stroke="white" stroke-opacity="0.45" stroke-width="1.2"
+        stroke-linecap="round"/>
+  <circle cx="6.2" cy="7.6" r="1.1" fill="white" fill-opacity="0.85"/>
+</svg>

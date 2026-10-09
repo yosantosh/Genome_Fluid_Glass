@@ -42,6 +42,11 @@
       <summary>Accent for ON states only</summary>
       <description>Ubuntu orange, slightly desaturated; one variable switch.</description>
     </key>
+    <key name="show-indicator" type="b">
+      <default>true</default>
+      <summary>Show top bar button</summary>
+      <description>Fluid Glass icon at the top right, left of Wi-Fi/sound/battery. Click opens these settings.</description>
+    </key>
     <key name="frosted-fallback" type="b">
       <default>false</default>
       <summary>CSS-only frosted fallback</summary>

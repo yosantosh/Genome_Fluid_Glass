@@ -216,3 +216,17 @@
 .fluid-glass-frosted.fluid-glass-banner {
   background-color: rgba(24, 24, 28, 0.72) !important;
 }
+
+/* ---------- TOP BAR BUTTON: Fluid Glass icon, left of Quick Settings ----
+ * Minimal ghost pill; legibility from the icon, never a grey slab. */
+#panel .genome-fluid-glass-button {
+  border-radius: 99px !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+#panel .genome-fluid-glass-button:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+#panel .genome-fluid-glass-icon {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
