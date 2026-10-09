@@ -4,20 +4,12 @@
  * Why one block: every surface reads as the same material.
  * ============================================================ */
 
-/* Container veil (dark variant first; carries white text on any wallpaper) */
-.fluid-glass-root {
-  --fg-r: 26px;                      /* container radius, 26-28 */
-  --fg-r-inner: 14px;                /* cards = R minus padding */
-  --fg-veil: rgba(24, 24, 28, 0.38); /* 0.30-0.50; legibility wins */
-  --fg-veil-dock: rgba(255, 255, 255, 0.06); /* dock veil is lighter */
-  --fg-rim: rgba(255, 255, 255, 0.20);       /* 1px rim, 0.16-0.24 */
-  --fg-card: rgba(255, 255, 255, 0.08);      /* inner cards 0.07-0.10 */
-  --fg-card-hover: rgba(255, 255, 255, 0.14);/* hover 0.12-0.16 */
-  --fg-txt: rgba(255, 255, 255, 0.95);
-  --fg-txt-2: rgba(255, 255, 255, 0.66);
-  --fg-txt-3: rgba(255, 255, 255, 0.40);
-  --fg-accent: #E0783C;              /* ON states only */
-}
+/* Container veil (dark variant first; carries white text on any wallpaper).
+ * NOTE: St (GNOME Shell CSS) has no var() — these are plain values,
+ * listed here once so every surface below stays in one family.
+ *   R 26px / inner 14px / veil rgba(24,24,28,0.38) / dock veil rgba(255,255,255,0.06)
+ *   rim rgba(255,255,255,0.20) / card 0.08 / hover 0.14
+ *   txt 0.95 / txt2 0.66 / txt3 0.40 / accent #E0783C (ON states only) */
 
 /* ---------- One surface = one shape = one painter ----------
  * Wrappers paint nothing; only the container paints veil/rim/shadow.
@@ -39,17 +31,24 @@
 
 /* ---------- DOCK (baseline preserved from dock-tight) ---------- */
 #dashtodockContainer.bottom.shrink {
-  margin-bottom: 10px !important; /* floating gap 8-12px; why: daylight from edge */
+  margin-bottom: 6px !important; /* floating gap, closer but never touching */
   padding-bottom: 0 !important;
 }
 #dashtodockContainer.bottom.shrink #dash .dash-background {
-  margin-bottom: 10px !important;
-  padding: 6px !important; /* tight even padding hugs icons */
-  border-radius: 24px !important;
+  margin-bottom: 6px !important;
+  padding: 4px !important; /* slimmer pill hugs icons tighter */
+  border-radius: 24px !important; /* must equal shader dock-corner-radius */
   background-color: rgba(255, 255, 255, 0.06) !important; /* single flat veil */
   border: 1px solid rgba(255, 255, 255, 0.20) !important; /* the ONLY edge */
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30),
               0 16px 40px rgba(0, 0, 0, 0.30) !important; /* specular + depth */
+}
+/* Slimmer icon rows: less air above/below icons. */
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile {
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
 }
 /* Tile-less icons: Yaru tiles cleared, whisper hover only */
 #dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-icon,
@@ -58,7 +57,7 @@
   background: none !important;
   border-color: transparent !important;
   box-shadow: none !important;
-  padding: 3px !important;
+  padding: 2px !important;
 }
 #dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:hover .overview-icon,
 #dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:hover .overview-icon {
@@ -68,8 +67,8 @@
 #dashtodockContainer.bottom.shrink #dash .dash-separator {
   background-color: rgba(255, 255, 255, 0.15) !important;
   width: 1px !important;
-  margin-top: 8px !important;
-  margin-bottom: 8px !important;
+  margin-top: 6px !important;
+  margin-bottom: 6px !important;
 }
 #dashtodockContainer.bottom.shrink .app-well-app-running-dot {
   width: 4px !important;

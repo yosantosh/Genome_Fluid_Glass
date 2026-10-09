@@ -2,8 +2,8 @@
 <schemalist>
   <schema id="org.gnome.shell.extensions.genome-fluid-glass" path="/org/gnome/shell/extensions/genome-fluid-glass/">
     <!-- Global blur pipeline (mirrors the dock fluid-glass quality) -->
-    <key name="sigma" type="i">
-      <default>32</default>
+    <key name="sigma" type="d">
+      <default>32.0</default>
       <summary>Blur sigma</summary>
       <description>Strong blur 30-40. Lower to 24 if laggy.</description>
     </key>

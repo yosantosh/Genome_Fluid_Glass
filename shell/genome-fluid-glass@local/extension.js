@@ -30,9 +30,9 @@ class FluidGlassIndicator extends PanelMenu.Button {
             } catch {
                 // Fallback for shells without Extension.openPreferences().
                 try {
-                    const ctx = global.create_app_launch_context(0, -1);
-                    Gio.AppInfo.launch_default_for_uri(
-                        `gnome-extensions://prefs/${this._ext.uuid}`, ctx);
+                    Gio.Subprocess.new(
+                        ['gnome-extensions', 'prefs', this._ext.uuid],
+                        Gio.SubprocessFlags.NONE);
                 } catch { /* never trap the top bar */ }
             }
             return true;
