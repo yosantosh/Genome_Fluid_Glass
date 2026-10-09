@@ -1,0 +1,82 @@
+/* Dock Tight — macOS-style bottom pill: floating, tile-less, tight.
+ * The shell pins an autohide dock by transform, so the effective float
+ * levers are the inner background inset plus liquid-glass dock-margin-bottom
+ * (kept equal at 10px). Outer margin covers the fixed-dock case. */
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+/* B. Even 5px top/bottom (was 5/4 uneven); with 3px icon padding the pill
+ * hugs evenly on all sides. */
+
+/* macOS has no tiles: icons float directly on the pill. Yaru paints
+ * #373737 tiles plus grey hover/focus fills — clear them all. */
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:focus .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile:focus .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile.running .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app.running .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:active .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:active .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile:active .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:checked .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:checked .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile:checked .overview-icon {
+    background-color: transparent !important;
+    background-image: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    padding: 3px !important;
+}
+
+/* Whisper of hover feedback on bare glass. */
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:hover .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:hover .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile:hover .overview-icon {
+    background-color: rgba(255, 255, 255, 0.12) !important; /* hover: 0.10-0.16 */
+    transition-duration: 150ms !important;
+}
+
+/* F. Hairline separator between apps and Trash/mounts, shorter than icons. */
+#dashtodockContainer.bottom.shrink #dash .dash-separator {
+    background-color: rgba(255, 255, 255, 0.12) !important; /* hairline: 0.08-0.16 */
+    width: 1px !important;
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+/* E. Running dots: 4px, soft white 0.8 + faint glow, snug below icon. */
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app .app-well-app-running-dot,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app .app-grid-running-dot,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile .app-well-app-running-dot,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile .app-grid-running-dot {
+    margin-bottom: 2px !important;
+    width: 4px !important; /* dot size: 3-5px safe */
+    height: 4px !important;
+    border-radius: 99px !important;
+    background-color: rgba(255, 255, 255, 0.8) !important; /* dot alpha: 0.7-0.9 */
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.35) !important; /* glow: 0.25-0.45 */
+}
+
+/* ~10px daylight between screen bottom and pill, like the macOS reference. */
+#dashtodockContainer.bottom.shrink {
+    margin-bottom: 10px !important;
+    padding-bottom: 0 !important;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-background {
+    margin-bottom: 10px !important; /* float gap kept */
+    padding: 6px !important; /* even 6px all sides; radius 24 = icon rounding + pad */
+    border-radius: 24px !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important; /* edge: 0.08-0.14 */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18) !important; /* top light only: 0.12-0.22 */
+}
+/* Deflicker: single shadow source — outer float shadow removed here so only
+ * the liquid-glass shader shadow (shadow-radius 50 @ 0.22) paints it. No two
+ * shadows fighting per frame. Background stays transparent (no 2nd layer). */
