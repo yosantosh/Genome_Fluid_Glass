@@ -75,6 +75,10 @@ dconf write /org/gnome/shell/extensions/blur-my-shell/panel/override-background 
 dconf write /org/gnome/shell/extensions/blur-my-shell/popup/blur false || true
 dconf write /org/gnome/shell/extensions/blur-my-shell/dash-to-dock/blur false || true
 
+echo "==> Dock prefs: Show Applications button first"
+dconf write /org/gnome/shell/extensions/dash-to-dock/show-show-apps-button true || true
+dconf write /org/gnome/shell/extensions/dash-to-dock/show-apps-at-top true || true
+
 if [ "$DO_ENABLE" -eq 1 ]; then
   echo "==> Enabling $UUID"
   gnome-extensions enable "$UUID" || {
