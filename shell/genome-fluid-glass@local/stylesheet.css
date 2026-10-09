@@ -1,0 +1,218 @@
+/* ============================================================
+ * Genome Fluid Glass — shared tokens. Tune ONLY here.
+ * One glass family: dock, top bar, QS, calendar, banners, OSD.
+ * Why one block: every surface reads as the same material.
+ * ============================================================ */
+
+/* Container veil (dark variant first; carries white text on any wallpaper) */
+.fluid-glass-root {
+  --fg-r: 26px;                      /* container radius, 26-28 */
+  --fg-r-inner: 14px;                /* cards = R minus padding */
+  --fg-veil: rgba(24, 24, 28, 0.38); /* 0.30-0.50; legibility wins */
+  --fg-veil-dock: rgba(255, 255, 255, 0.06); /* dock veil is lighter */
+  --fg-rim: rgba(255, 255, 255, 0.20);       /* 1px rim, 0.16-0.24 */
+  --fg-card: rgba(255, 255, 255, 0.08);      /* inner cards 0.07-0.10 */
+  --fg-card-hover: rgba(255, 255, 255, 0.14);/* hover 0.12-0.16 */
+  --fg-txt: rgba(255, 255, 255, 0.95);
+  --fg-txt-2: rgba(255, 255, 255, 0.66);
+  --fg-txt-3: rgba(255, 255, 255, 0.40);
+  --fg-accent: #E0783C;              /* ON states only */
+}
+
+/* ---------- One surface = one shape = one painter ----------
+ * Wrappers paint nothing; only the container paints veil/rim/shadow.
+ * Why: kills the double-layer rim and the grey bottom strip. */
+.fluid-glass-root .popup-menu-boxpointer,
+.fluid-glass-root .popup-menu-content,
+.fluid-glass-root .quick-settings-grid,
+.fluid-glass-root .message-list,
+.fluid-glass-root .message-list-controls,
+.fluid-glass-root .datemenu-today-button,
+.fluid-glass-root .quick-settings-system-item > StBoxLayout,
+.fluid-glass-root .quick-slider .slider-bin,
+.fluid-glass-root .quick-toggle-separator {
+  background: none !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- DOCK (baseline preserved from dock-tight) ---------- */
+#dashtodockContainer.bottom.shrink {
+  margin-bottom: 10px !important; /* floating gap 8-12px; why: daylight from edge */
+  padding-bottom: 0 !important;
+}
+#dashtodockContainer.bottom.shrink #dash .dash-background {
+  margin-bottom: 10px !important;
+  padding: 6px !important; /* tight even padding hugs icons */
+  border-radius: 24px !important;
+  background-color: rgba(255, 255, 255, 0.06) !important; /* single flat veil */
+  border: 1px solid rgba(255, 255, 255, 0.20) !important; /* the ONLY edge */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30),
+              0 16px 40px rgba(0, 0, 0, 0.30) !important; /* specular + depth */
+}
+/* Tile-less icons: Yaru tiles cleared, whisper hover only */
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps .overview-icon {
+  background: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  padding: 3px !important;
+}
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:hover .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:hover .overview-icon {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  transition-duration: 150ms !important;
+}
+#dashtodockContainer.bottom.shrink #dash .dash-separator {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  width: 1px !important;
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+#dashtodockContainer.bottom.shrink .app-well-app-running-dot {
+  width: 4px !important;
+  height: 4px !important;
+  border-radius: 99px !important;
+  background-color: rgba(255, 255, 255, 0.8) !important; /* one subtle dot */
+  box-shadow: none !important;
+  margin-bottom: 2px !important;
+}
+
+/* ---------- TOP BAR: fully transparent, text-shadow for legibility ---------- */
+#panel {
+  background: none !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+#panel .panel-button {
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+#panel .panel-button:checked, /* open QS / date menu pill only */
+#panel .panel-button:active {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 99px !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- QUICK SETTINGS ---------- */
+.fluid-glass-qs {
+  border-radius: 26px !important;
+  background-color: rgba(24, 24, 28, 0.38) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30),
+              0 16px 40px rgba(0, 0, 0, 0.30) !important;
+  padding: 14px !important;
+}
+.fluid-glass-qs .quick-toggle { /* ONE capsule, split tiles share it */
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 14px !important;
+  transition-duration: 150ms !important;
+}
+.fluid-glass-qs .quick-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+}
+.fluid-glass-qs .quick-toggle:checked { /* accent glass, not flat paint */
+  background-color: rgba(224, 120, 60, 0.55) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+.fluid-glass-qs .quick-toggle .quick-toggle-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.fluid-glass-qs .quick-toggle .quick-toggle-subtitle {
+  color: rgba(255, 255, 255, 0.66) !important;
+}
+.fluid-glass-qs .quick-slider .slider {
+  -barlevel-height: 6px !important;
+  -barlevel-background-color: rgba(255, 255, 255, 0.18) !important;
+  -barlevel-active-background-color: rgba(255, 255, 255, 0.65) !important;
+  -barlevel-border-color: transparent !important;
+  color: #ffffff !important;
+}
+.fluid-glass-qs .quick-settings-system-item .icon-button,
+.fluid-glass-qs .quick-settings-system-item .button {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 999px !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- CALENDAR / DATE MENU ---------- */
+.fluid-glass-menu {
+  border-radius: 26px !important;
+  background-color: rgba(24, 24, 28, 0.38) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30),
+              0 16px 40px rgba(0, 0, 0, 0.30) !important;
+  padding: 14px !important;
+}
+.fluid-glass-menu .calendar {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.fluid-glass-menu .calendar-day { /* regular days: text only, no circles */
+  background: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.fluid-glass-menu .calendar-day:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 99px !important;
+}
+.fluid-glass-menu .calendar-today, /* today = ONE accent circle */
+.fluid-glass-menu .calendar-today:hover {
+  background-color: #E0783C !important;
+  color: #fff !important;
+  border-radius: 99px !important;
+  border: none !important;
+}
+.fluid-glass-menu .calendar-day-heading,
+.fluid-glass-menu .calendar-week-number {
+  background: none !important; /* no boxes on headings/week numbers */
+  border: none !important;
+  color: rgba(255, 255, 255, 0.40) !important;
+}
+.fluid-glass-menu .calendar-month-header .pager-button {
+  background: none !important; /* ghost arrows */
+  border: none !important;
+}
+.fluid-glass-menu .events-button,
+.fluid-glass-menu .world-clocks-button,
+.fluid-glass-menu .message {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 14px !important;
+  margin-bottom: 8px !important;
+}
+
+/* ---------- BANNERS / OSD ---------- */
+.fluid-glass-banner {
+  border-radius: 22px !important;
+  max-width: 400px !important; /* narrower than the 510px slab */
+  margin-top: 10px !important; /* 10-12px gap under top bar */
+  background-color: rgba(24, 24, 28, 0.38) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30),
+              0 16px 40px rgba(0, 0, 0, 0.30) !important;
+}
+.fluid-glass-banner .message {
+  background: none !important;
+  border: none !important;
+}
+
+/* ---------- FROSTED FALLBACK (no shader): honest non-glass ---------- */
+.fluid-glass-frosted.fluid-glass-qs,
+.fluid-glass-frosted.fluid-glass-menu,
+.fluid-glass-frosted.fluid-glass-banner {
+  background-color: rgba(24, 24, 28, 0.72) !important;
+}

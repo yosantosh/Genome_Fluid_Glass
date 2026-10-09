@@ -1,0 +1,23 @@
+/* Genome Fluid Glass — Nautilus (GTK4, dark-first).
+ * NOTE: GTK cannot do live wallpaper blur from a shell extension; this is a
+ * translucent twin of the shell glass, not true refraction. Applied via
+ * ~/.config/gtk-4.0/gtk.css (symlink or copy from here). */
+window.nautilus-window {
+  background-color: rgba(24, 24, 28, 0.92);
+  border-radius: 12px;
+}
+.nautilus-window .sidebar {
+  background-color: rgba(30, 30, 34, 0.85);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+.nautilus-window headerbar {
+  background-color: rgba(30, 30, 34, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.nautilus-window .view {
+  background-color: rgba(24, 24, 28, 0.92);
+}
+.nautilus-window row:selected,
+.nautilus-window .view:selected {
+  background-color: rgba(224, 120, 60, 0.35);
+}

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.genome-fluid-glass" path="/org/gnome/shell/extensions/genome-fluid-glass/">
+    <!-- Global blur pipeline (mirrors the dock fluid-glass quality) -->
+    <key name="sigma" type="i">
+      <default>32</default>
+      <summary>Blur sigma</summary>
+      <description>Strong blur 30-40. Lower to 24 if laggy.</description>
+    </key>
+    <key name="brightness" type="d">
+      <default>1.10</default>
+      <summary>Backdrop brightness</summary>
+      <description>Slightly above 1 so dark and bright wallpapers land at a similar tone.</description>
+    </key>
+    <key name="contrast" type="d">
+      <default>1.05</default>
+      <summary>Backdrop contrast</summary>
+      <description>Slightly below/at 1 to keep the veil neutral.</description>
+    </key>
+    <key name="saturation" type="d">
+      <default>1.5</default>
+      <summary>Backdrop saturation</summary>
+      <description>1.3-1.5 keeps color alive without tinting the glass.</description>
+    </key>
+    <key name="container-radius" type="d">
+      <default>26.0</default>
+      <summary>Panel container radius</summary>
+      <description>QS, calendar panel and banner share one radius (26-28).</description>
+    </key>
+    <key name="veil-alpha" type="d">
+      <default>0.38</default>
+      <summary>Dark veil alpha</summary>
+      <description>rgba(24,24,28,alpha), 0.30-0.50. Text must keep 4.5:1 on white.</description>
+    </key>
+    <key name="rim-alpha" type="d">
+      <default>0.20</default>
+      <summary>Rim alpha</summary>
+      <description>1px rgba(255,255,255,alpha), 0.16-0.24.</description>
+    </key>
+    <key name="accent" type="s">
+      <default>"#E0783C"</default>
+      <summary>Accent for ON states only</summary>
+      <description>Ubuntu orange, slightly desaturated; one variable switch.</description>
+    </key>
+    <key name="frosted-fallback" type="b">
+      <default>false</default>
+      <summary>CSS-only frosted fallback</summary>
+      <description>Higher-opacity veil with no real blur when the shader path is unavailable.</description>
+    </key>
+    <key name="enable-dock-glass" type="b">
+      <default>true</default>
+      <summary>Glass the dock</summary>
+    </key>
+    <key name="enable-quick-settings-glass" type="b">
+      <default>true</default>
+      <summary>Glass Quick Settings</summary>
+    </key>
+    <key name="enable-menu-glass" type="b">
+      <default>true</default>
+      <summary>Glass calendar / date menu</summary>
+    </key>
+    <key name="enable-notification-glass" type="b">
+      <default>true</default>
+      <summary>Glass notification banners and list cards</summary>
+    </key>
+    <key name="enable-osd-glass" type="b">
+      <default>true</default>
+      <summary>Glass OSD popups</summary>
+    </key>
+  </schema>
+</schemalist>

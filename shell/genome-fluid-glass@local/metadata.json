@@ -1,0 +1,8 @@
+{
+  "uuid": "genome-fluid-glass@local",
+  "name": "Genome Fluid Glass",
+  "description": "One fluid-glass family for dock, top bar, Quick Settings, calendar/notifications, banners and OSD. Same veil, rim, specular and shadow everywhere; real blur via the shell shader path with a CSS frosted fallback.",
+  "shell-version": ["50", "51"],
+  "version": 1,
+  "url": "https://github.com/yosantosh/Genome_Fluid_Glass"
+}
