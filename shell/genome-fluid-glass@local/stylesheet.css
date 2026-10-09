@@ -31,11 +31,11 @@
 
 /* ---------- DOCK (baseline preserved from dock-tight) ---------- */
 #dashtodockContainer.bottom.shrink {
-  margin-bottom: 6px !important; /* floating gap, closer but never touching */
+  margin-bottom: 0 !important; /* transparent wrapper hugs the edge; owns no gap */
   padding-bottom: 0 !important;
 }
 #dashtodockContainer.bottom.shrink #dash .dash-background {
-  margin-bottom: 6px !important;
+  margin-bottom: 2px !important; /* THE gap: 2px daylight, never touching */
   padding: 4px !important; /* slimmer pill hugs icons tighter */
   border-radius: 24px !important; /* must equal shader dock-corner-radius */
   background-color: rgba(255, 255, 255, 0.06) !important; /* single flat veil */
