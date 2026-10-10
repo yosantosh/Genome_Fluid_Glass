@@ -83,8 +83,8 @@ echo "==> App blur for Files (CSS owns alpha; dynamic-opacity off or focus kills
 dconf write /org/gnome/shell/extensions/blur-my-shell/applications/blur true || true
 dconf write /org/gnome/shell/extensions/blur-my-shell/applications/whitelist "['org.gnome.Nautilus']" || true
 dconf write /org/gnome/shell/extensions/blur-my-shell/applications/enable-all false || true
-dconf write /org/gnome/shell/extensions/blur-my-shell/applications/sigma 20 || true
-dconf write /org/gnome/shell/extensions/blur-my-shell/applications/brightness 0.9 || true
+dconf write /org/gnome/shell/extensions/blur-my-shell/applications/sigma 24 || true
+dconf write /org/gnome/shell/extensions/blur-my-shell/applications/brightness 0.85 || true
 dconf write /org/gnome/shell/extensions/blur-my-shell/applications/corner-radius 12 || true
 dconf write /org/gnome/shell/extensions/blur-my-shell/applications/dynamic-opacity false || true
 dconf write /org/gnome/shell/extensions/blur-my-shell/applications/opacity 255 || true
