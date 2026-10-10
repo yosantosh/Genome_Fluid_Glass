@@ -1,23 +1,297 @@
-/* Genome Fluid Glass — Nautilus (GTK4, dark-first).
- * NOTE: GTK cannot do live wallpaper blur from a shell extension; this is a
- * translucent twin of the shell glass, not true refraction. Applied via
- * ~/.config/gtk-4.0/gtk.css (symlink or copy from here). */
+/* ================================================================
+ * Genome Fluid Glass — Files (Nautilus), dark-first.
+ * Same glass family as the dock. Live at ~/.config/gtk-4.0/gtk.css
+ * (this repo's gtk-dark.css; restart Files with `nautilus -q`).
+ *
+ * TOKENS (tune here; every rule below points back at these):
+ *   window veil ....... transparent (panes paint; one painter per region)
+ *   sidebar veil ...... rgba(24,24,28,0.30-0.45)  most see-through (Finder vibrancy)
+ *   content veil ...... rgba(18,18,22,0.60-0.75)  calmer, text lives here
+ *   rim ............... 1px rgba(255,255,255,0.10-0.16), ONE per window
+ *   hover ............. white 0.06-0.08 / pressed 0.12-0.16
+ *   sidebar selected .. neutral white 0.12-0.16, icon primary white
+ *   content selected .. accent wash (see ACCENT below)
+ *   text .............. 0.95 / secondary 0.62-0.70 / decorative 0.40
+ *   radii ............. rows 10px, popovers 14-16px, path pill, controls circles
+ *   motion ............ 120-180ms ease-out
+ *   blur (BMS apps) ... sigma 20, brightness 0.9 (see dconf note below)
+ *
+ * ACCENT (system-owned, live-switchable, NO hardcoded hue in this file —
+ *   prove with: grep -n -E "#[0-9a-fA-F]{6}|rgba\(224" gtk-dark.css):
+ *   Only @accent_bg_color / @accent_fg_color / @accent_color + alpha().
+ *   (alpha() is guaranteed GTK4; mix() is unverified, so the anti-mud
+ *   white-lift is a layered white gradient instead of a mix call.)
+ *   Allowed accent uses: content-row selection, focus ring, primary buttons.
+ *   Everything else stays neutral so ANY of the 10 system accents reads clean.
+ *
+ * BLUR (outside CSS — Blur my Shell, verified schema keys):
+ *   applications/blur=true, whitelist=['org.gnome.Nautilus'],
+ *   enable-all=false, sigma=20, brightness=0.9, corner-radius=12,
+ *   dynamic-opacity=false (else the focused window goes opaque!),
+ *   opacity=255 (CSS veils own the alpha), static-blur=true (cheaper),
+ *   unblur-when-fullscreen=false.
+ * FALLBACK (no/failing blur): raise sidebar veil to ~0.55 and content
+ *   veil to ~0.85 below. Honest frosted, not true glass.
+ *
+ * VERIFY in GTK Inspector (Ctrl+Shift+D after enabling the keybinding):
+ *   [V1] window node carries .nautilus-window
+ *   [V2] sidebar node/class (.navigation-sidebar vs placessidebar)
+ *   [V3] pathbar node/class (.path-bar)
+ *   [V4] @accent_* resolve under Yaru-dark (test one rule in the CSS tab)
+ *   [V5] star toggle node (section 6 is commented out until confirmed)
+ * ================================================================ */
+
+/* ---------- 1. Window + panes: transparent root, one painter each --- */
+/* Why transparent root: window + sidebar + content all painting = stacked
+ * alpha (~0.64 from two 0.4 layers) and a seam on bright backdrops. */
 window.nautilus-window {
-  background-color: rgba(24, 24, 28, 0.92);
+  background-color: transparent;
+}
+/* Keep the toolkit's own shadow; swap its dark 1px outline for our rim.
+ * Why: ONE rim + ONE shadow per window, never a second set on top. */
+window.nautilus-window.csd {
+  box-shadow: 0 3px 9px 1px rgba(0, 0, 0, 0.5);
+  outline: 1px solid rgba(255, 255, 255, 0.13);
+  outline-offset: -1px;
   border-radius: 12px;
 }
-.nautilus-window .sidebar {
-  background-color: rgba(30, 30, 34, 0.85);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+/* Sidebar = most see-through pane. [V2] */
+window.nautilus-window .navigation-sidebar,
+window.nautilus-window placessidebar {
+  background-color: rgba(24, 24, 28, 0.38);
 }
-.nautilus-window headerbar {
-  background-color: rgba(30, 30, 34, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+/* Content = calmer, more opaque; text is read here. */
+window.nautilus-window .view,
+window.nautilus-window gridview,
+window.nautilus-window columnview {
+  background-color: rgba(18, 18, 22, 0.68);
+  color: rgba(255, 255, 255, 0.95);
 }
-.nautilus-window .view {
-  background-color: rgba(24, 24, 28, 0.92);
+/* Headerbars transparent and continuous with their pane: no fill, no seam. */
+window.nautilus-window headerbar.titlebar {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
 }
-.nautilus-window row:selected,
-.nautilus-window .view:selected {
-  background-color: rgba(224, 120, 60, 0.35);
+/* Single hairline between panes (drop if veil contrast is enough). */
+window.nautilus-window separator.sidebar {
+  background-color: rgba(255, 255, 255, 0.07);
+  min-width: 1px;
+}
+
+/* ---------- 2. Sidebar rows: neutral pills, hue-independent --------- */
+window.nautilus-window .navigation-sidebar row,
+window.nautilus-window placessidebar row {
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin: 1px 8px;
+  color: rgba(255, 255, 255, 0.95);
+  background-color: transparent;
+  border: none;
+  transition: background-color 150ms ease-out;
+}
+window.nautilus-window .navigation-sidebar row:hover,
+window.nautilus-window placessidebar row:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+window.nautilus-window .navigation-sidebar row:active,
+window.nautilus-window placessidebar row:active {
+  background-color: rgba(255, 255, 255, 0.14);
+}
+/* Selected sidebar row: neutral, never the accent (accent lives in content). */
+window.nautilus-window .navigation-sidebar row:selected,
+window.nautilus-window placessidebar row:selected {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.95);
+}
+window.nautilus-window .navigation-sidebar row:selected image,
+window.nautilus-window placessidebar row:selected image {
+  color: rgba(255, 255, 255, 0.95);
+}
+window.nautilus-window .navigation-sidebar image,
+window.nautilus-window placessidebar image {
+  -gtk-icon-size: 16px;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+/* ---------- 3. Path bar + header buttons: ghosts and pills ---------- */
+/* [V3] Path bar pill: translucent, no heavy border. */
+window.nautilus-window headerbar .path-bar,
+window.nautilus-window headerbar pathbar {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  border: none;
+  padding: 2px 6px;
+}
+window.nautilus-window headerbar .path-bar:hover,
+window.nautilus-window headerbar pathbar:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+/* Ghost header buttons: no fill until hover. */
+window.nautilus-window headerbar button.flat,
+window.nautilus-window headerbar button.image-button {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.9);
+  transition: background-color 150ms ease-out;
+}
+window.nautilus-window headerbar button.flat:hover,
+window.nautilus-window headerbar button.image-button:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+/* Window controls: ghost circles; close gets a soft red hover. */
+window.nautilus-window headerbar button.titlebutton {
+  border-radius: 999px;
+  border: none;
+  background-color: transparent;
+  background-image: none;
+  color: rgba(255, 255, 255, 0.9);
+}
+window.nautilus-window headerbar button.titlebutton:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+window.nautilus-window headerbar button.titlebutton.close:hover {
+  background-color: rgba(224, 82, 82, 0.65);
+  color: #ffffff;
+}
+
+/* ---------- 4. List rows: wash selection, quiet metadata ------------ */
+/* No zebra, no row borders; airy 44-48px rows. */
+window.nautilus-window columnview row,
+window.nautilus-window listview > row {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: rgba(255, 255, 255, 0.95);
+  transition: background-color 150ms ease-out;
+}
+window.nautilus-window columnview row:hover,
+window.nautilus-window listview > row:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+/* Content selection = accent wash + white lift (anti-mud for every hue:
+ * low-alpha accent alone desaturates into brown/olive/navy over dark). */
+window.nautilus-window columnview row:selected,
+window.nautilus-window listview > row:selected {
+  background-color: alpha(@accent_bg_color, 0.30);
+  background-image: linear-gradient(alpha(white, 0.07), alpha(white, 0.07));
+  box-shadow: inset 0 0 0 1px alpha(@accent_bg_color, 0.45);
+  color: rgba(255, 255, 255, 0.95);
+}
+/* Column headers: small, secondary, no fill, no heavy dividers. */
+window.nautilus-window columnview header button {
+  background: none;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: smaller;
+}
+/* Focus ring: accent, one of only three allowed accent uses. */
+window.nautilus-window :focus-visible {
+  outline: 2px solid alpha(@accent_bg_color, 0.5);
+  outline-offset: -2px;
+}
+
+/* ---------- 5. Grid view: soft tiles, no hard outlines ------------- */
+window.nautilus-window gridview > child {
+  border-radius: 12px;
+  padding: 10px 6px;
+  border: none;
+  transition: background-color 150ms ease-out;
+}
+window.nautilus-window gridview > child:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+window.nautilus-window gridview > child:selected {
+  background-color: alpha(@accent_bg_color, 0.30);
+  background-image: linear-gradient(alpha(white, 0.07), alpha(white, 0.07));
+  box-shadow: inset 0 0 0 1px alpha(@accent_bg_color, 0.45);
+}
+window.nautilus-window gridview thumbnail,
+window.nautilus-window gridview picture {
+  border-radius: 8px;
+}
+
+/* ---------- 6. Star column: hover-only [V5 — OFF until confirmed] --- */
+/* No star selector exists in the Yaru CSS, so this stays commented out
+ * until the Inspector names the node. If CSS can't reach it, it needs
+ * code, not more selectors — say so instead of guessing. */
+/* window.nautilus-window columnview row:not(:hover) .star-toggle { opacity: 0; } */
+/* window.nautilus-window columnview row:hover .star-toggle,
+   window.nautilus-window columnview row .star-toggle:checked { opacity: 1; } */
+
+/* ---------- 7. Popovers / menus / tooltips: frosted fallback ------- */
+/* Separate surfaces; BMS app blur doesn't reliably cover them, so they
+ * always get the higher-alpha frosted treatment. */
+window.nautilus-window popover > contents,
+window.nautilus-window popover.menu > contents {
+  background-color: rgba(24, 24, 28, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 15px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  padding: 6px;
+}
+window.nautilus-window popover modelbutton {
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.95);
+}
+window.nautilus-window popover modelbutton:hover {
+  background-color: rgba(255, 255, 255, 0.10);
+}
+/* Tooltip: small frosted pill, never pure black. */
+window.nautilus-window tooltip,
+tooltip.nautilus-window {
+  background-color: rgba(24, 24, 28, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.95);
+}
+tooltip {
+  background-color: rgba(24, 24, 28, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* ---------- 8. Scrollbars: thin overlay, auto presence -------------- */
+/* Slider keeps its toolkit border (border:none breaks GTK size math and
+ * logs negative-width warnings); radius + veil give the overlay look. */
+window.nautilus-window scrollbar slider {
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.30);
+}
+window.nautilus-window scrollbar {
+  background: none;
+  border: none;
+}
+
+/* ---------- 9. Unfocused windows stay glass, never flip opaque ------ */
+window.nautilus-window:backdrop .navigation-sidebar,
+window.nautilus-window:backdrop placessidebar {
+  background-color: rgba(24, 24, 28, 0.38);
+}
+window.nautilus-window:backdrop .view,
+window.nautilus-window:backdrop gridview,
+window.nautilus-window:backdrop columnview {
+  background-color: rgba(18, 18, 22, 0.68);
+}
+window.nautilus-window:backdrop headerbar.titlebar {
+  background-color: transparent;
+}
+
+/* ---------- 10. Dialogs/properties: same tokens, few rules ---------- */
+window.nautilus-window dialog,
+window.nautilus-window .dialog {
+  background-color: rgba(24, 24, 28, 0.82);
+}
+window.nautilus-window button.suggested-action {
+  background-color: @accent_bg_color;
+  color: @accent_fg_color;
+  border-radius: 999px;
+  border: none;
 }
