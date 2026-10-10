@@ -9,15 +9,15 @@
  *   result = backdrop x (1-a) + veil x a; body+secondary >= 4.5:1 on
  *   pure-white (dark glass) / pure-black (light glass) torture backdrops.
  * DARK set  — veil rgba(20,20,24,0.65): body 5.34:1, secondary 4.66:1.
- *   container R 26 / cards R 14 / rim rgba(255,255,255,0.20)
+ *   container R 26 / cards R 16 / rim rgba(255,255,255,0.20)
  *   specular inset 0 1px 0 rgba(255,255,255,0.30)
- *   shadow 0 16px 40px rgba(0,0,0,0.30)
- *   card fill white 0.08 / hover 0.14 / pressed 0.18
+ *   shadow 0 16px 40px rgba(0,0,0,0.30) / container padding 6px (Yaru stock)
+ *   card fill white 0.055 + inset top hairline 0.12 / hover 0.10
  *   text white 0.95 / secondary 0.85 / tertiary 0.45 (decorative only)
  *   divider white 0.08. Accent = system -st-accent-color (+ fg) ONLY.
  * LIGHT set (.fluid-glass-light on same actor, toggled from color-scheme) —
  *   veil rgba(255,255,255,0.60): body 5.79:1, secondary 4.53:1.
- *   card fill black 0.06 / hover 0.10 / pressed 0.14
+ *   card fill black 0.045 + inset top light / hover 0.10
  *   text rgba(20,20,24,0.92/0.78/0.40)
  *   rim white 0.65 + faint dark hairline rgba(0,0,0,0.08) as the FIRST
  *   box-shadow layer (belongs to shadow, not a second painted edge).
@@ -187,7 +187,7 @@
   border: 1px solid rgba(255, 255, 255, 0.20) !important; /* dock rim */
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30),
               0 16px 40px rgba(0, 0, 0, 0.30) !important; /* dock specular + depth */
-  padding: 14px !important;
+  padding: 6px !important; /* exact Yaru stock: default genome panel size */
   color: rgba(255, 255, 255, 0.95) !important;
 }
 /* Column divider: 1px hairline, not a hard edge. Why: Yaru paints a solid
@@ -198,16 +198,16 @@
 /* Notification cards: flat translucent fills on the glass — no own blur,
  * rim, border or shadow, so alpha never stacks into a seam. */
 .fluid-glass-menu .message {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.055) !important; /* lit glass, not a slab */
   background-image: none !important;
   border: none !important;
-  box-shadow: none !important;
-  border-radius: 14px !important; /* container 26 minus padding */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important; /* soft top light */
+  border-radius: 16px !important;
   margin-bottom: 8px !important;
   color: rgba(255, 255, 255, 0.85) !important;
 }
 .fluid-glass-menu .message:hover {
-  background-color: rgba(255, 255, 255, 0.14) !important;
+  background-color: rgba(255, 255, 255, 0.10) !important;
 }
 /* Stack glitch fix: collapsed group layers (:second/:lower-in-stack paint
  * Yaru-dark #45454a/#3d3d42 slabs) become ONE subtle offset fill in the
@@ -234,17 +234,17 @@
 .fluid-glass-menu .message .message-header .message-expand-button,
 .fluid-glass-menu .message .message-header .message-close-button,
 .fluid-glass-menu .message-notification-group .message-collapse-button {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.055) !important;
   background-image: none !important;
   border: none !important;
-  box-shadow: none !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
   border-radius: 999px !important;
   color: rgba(255, 255, 255, 0.85) !important;
 }
 .fluid-glass-menu .message .message-header .message-expand-button:hover,
 .fluid-glass-menu .message .message-header .message-close-button:hover,
 .fluid-glass-menu .message-notification-group .message-collapse-button:hover {
-  background-color: rgba(255, 255, 255, 0.14) !important;
+  background-color: rgba(255, 255, 255, 0.10) !important;
   color: rgba(255, 255, 255, 0.95) !important;
 }
 /* Calendar grid: same structure, ghost surfaces. Regular days are text
@@ -262,8 +262,7 @@
   font-weight: normal !important;
 }
 .fluid-glass-menu .calendar-day:hover {
-  background-color: rgba(255, 255, 255, 0.14) !important;
-  background-image: none !important;
+  background-color: rgba(255, 255, 255, 0.10) !important;
   border-radius: 99px !important;
 }
 .fluid-glass-menu .calendar-today, /* today = ONE system-accent circle */
@@ -283,7 +282,8 @@
   color: rgba(255, 255, 255, 0.85) !important;
 }
 .fluid-glass-menu .calendar-month-header .calendar-month-label {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.055) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
   color: rgba(255, 255, 255, 0.95) !important;
 }
 .fluid-glass-menu .calendar-month-header .pager-button {
@@ -294,23 +294,23 @@
   color: rgba(255, 255, 255, 0.85) !important;
 }
 .fluid-glass-menu .calendar-month-header .pager-button:hover {
-  background-color: rgba(255, 255, 255, 0.14) !important;
+  background-color: rgba(255, 255, 255, 0.10) !important;
 }
 /* Today / events / world clocks / Clear: inner-fill cards. */
 .fluid-glass-menu .datemenu-today-button,
 .fluid-glass-menu .events-button,
 .fluid-glass-menu .world-clocks-button {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.055) !important;
   background-image: none !important;
   border: none !important;
-  box-shadow: none !important;
-  border-radius: 14px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
   color: rgba(255, 255, 255, 0.95) !important;
 }
 .fluid-glass-menu .datemenu-today-button:hover,
 .fluid-glass-menu .events-button:hover,
 .fluid-glass-menu .world-clocks-button:hover {
-  background-color: rgba(255, 255, 255, 0.14) !important;
+  background-color: rgba(255, 255, 255, 0.10) !important;
 }
 .fluid-glass-menu .events-button .events-box .events-title,
 .fluid-glass-menu .world-clocks-button .world-clocks-header,
@@ -324,18 +324,21 @@
   color: rgba(255, 255, 255, 0.85) !important; /* "No Events" stays readable */
 }
 .fluid-glass-menu .message-list-controls .message-list-clear-button {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.055) !important;
   background-image: none !important;
   border: none !important;
-  box-shadow: none !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
   border-radius: 999px !important;
   color: rgba(255, 255, 255, 0.95) !important;
 }
 .fluid-glass-menu .message-list-controls .message-list-clear-button:hover {
-  background-color: rgba(255, 255, 255, 0.14) !important;
+  background-color: rgba(255, 255, 255, 0.10) !important;
 }
 .fluid-glass-menu .message-list .message-list-placeholder {
   color: rgba(255, 255, 255, 0.85) !important; /* empty state sits calmly */
+}
+.fluid-glass-menu .message-list .message-list-placeholder > StIcon {
+  icon-size: 64px !important; /* bell accents the column, not dominates it */
 }
 /* Keyboard focus: visible 2px accent ring on every interactive element. */
 .fluid-glass-menu .message:focus,
@@ -374,7 +377,8 @@
 .fluid-glass-menu.fluid-glass-light .message .message-header .message-expand-button,
 .fluid-glass-menu.fluid-glass-light .message .message-header .message-close-button,
 .fluid-glass-menu.fluid-glass-light .message-notification-group .message-collapse-button {
-  background-color: rgba(0, 0, 0, 0.06) !important;
+  background-color: rgba(0, 0, 0, 0.045) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
   color: rgba(20, 20, 24, 0.92) !important;
 }
 .fluid-glass-menu.fluid-glass-light .message:hover,
