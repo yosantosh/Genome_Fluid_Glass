@@ -28,19 +28,14 @@
       <description>QS, calendar panel and banner share one radius (26-28).</description>
     </key>
     <key name="veil-alpha" type="d">
-      <default>0.38</default>
+      <default>0.65</default>
       <summary>Dark veil alpha</summary>
-      <description>rgba(24,24,28,alpha), 0.30-0.50. Text must keep 4.5:1 on white.</description>
+      <description>rgba(20,20,24,alpha), 0.55-0.65. Measured floor for 4.5:1 body+secondary text on a pure-white backdrop. Lower only if you re-measure.</description>
     </key>
     <key name="rim-alpha" type="d">
       <default>0.20</default>
       <summary>Rim alpha</summary>
-      <description>1px rgba(255,255,255,alpha), 0.16-0.24.</description>
-    </key>
-    <key name="accent" type="s">
-      <default>"#E0783C"</default>
-      <summary>Accent for ON states only</summary>
-      <description>Ubuntu orange, slightly desaturated; one variable switch.</description>
+      <description>1px rgba(255,255,255,alpha), 0.16-0.24. Single edge only.</description>
     </key>
     <key name="show-indicator" type="b">
       <default>true</default>

@@ -26,15 +26,14 @@ export default class GenomeFluidGlassPreferences extends ExtensionPreferences {
 
         const shape = new Adw.PreferencesGroup({ title: 'Shape and veil', description: 'One radius family everywhere; hierarchy from spacing, never extra borders.' });
         shape.add(this._spin(settings, 'container-radius', 'Container radius', 'QS, calendar and banner share it (26–28).', 16, 32, 0.5, 1));
-        shape.add(this._spin(settings, 'veil-alpha', 'Veil alpha', 'Dark veil 0.30–0.50. Text must keep 4.5:1 on white.', 0.2, 0.7, 0.01, 2));
+        shape.add(this._spin(settings, 'veil-alpha', 'Veil alpha', 'Dark veil, measured floor 0.65 for 4.5:1 on white. Lower only if you re-measure.', 0.2, 0.7, 0.01, 2));
         shape.add(this._spin(settings, 'rim-alpha', 'Rim alpha', 'Single 1px rim, 0.16–0.24.', 0.08, 0.4, 0.01, 2));
-        const accent = new Adw.EntryRow({ title: 'Accent (ON states only)' });
-        accent.set_text(settings.get_string('accent'));
-        accent.connect('changed', () => {
-            const v = accent.get_text().trim();
-            if (/^#[0-9a-fA-F]{6}$/.test(v)) settings.set_string('accent', v);
-        });
-        shape.add(accent);
+        // Accent is the system accent (Settings → Appearance); the theme
+        // reads -st-accent-color / -st-accent-fg-color, no hardcoded hue.
+        shape.add(new Adw.ActionRow({
+            title: 'Accent: follows the system',
+            subtitle: 'Change it in Settings → Appearance. Today circle, focus ring and ON toggles update live.',
+        }));
         page.add(shape);
         return page;
     }

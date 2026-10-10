@@ -5,10 +5,14 @@ import St from 'gi://St';
 import Gio from 'gi://Gio';
 
 // Genome Fluid Glass — one glass family for dock, QS, calendar, banners.
-// CSS in stylesheet.css owns veil/rim/specular/shadow; this file owns the
-// top-bar button, root style-classes and (next) the blur attach.
+// CSS owns veil/rim/specular/shadow; liquid-glass shader owns blur; this
+// file owns the top-bar button, menu style-classes, the light-scheme switch
+// and the frosted fallback. Disable path removes every class it added, so a
+// GNOME update can never lock the session out.
 const QS_CLASS = 'fluid-glass-qs';
 const MENU_CLASS = 'fluid-glass-menu';
+const LIGHT_CLASS = 'fluid-glass-light';
+const FROSTED_CLASS = 'fluid-glass-frosted';
 
 class FluidGlassIndicator extends PanelMenu.Button {
     _init(ext) {
@@ -53,26 +57,31 @@ class FluidGlassIndicator extends PanelMenu.Button {
 export default class GenomeFluidGlassExtension extends Extension {
     _settings = null;
     _tracked = [];
+    _connections = [];
     _indicator = null;
-    _indicatorChangedId = 0;
 
     enable() {
         this._settings = this.getSettings();
-        this._tagWhenOpen('quickSettings', QS_CLASS, 'enable-quick-settings-glass');
-        this._tagWhenOpen('dateMenu', MENU_CLASS, 'enable-menu-glass');
+        // Tag now (covers already-built menus) and re-tag on open, because
+        // menu actors can be (re)created after enable on some shells.
+        this._watchMenu('quickSettings', QS_CLASS, 'enable-quick-settings-glass');
+        this._watchMenu('dateMenu', MENU_CLASS, 'enable-menu-glass');
+        this._on('changed::enable-quick-settings-glass', () =>
+            this._applyMenu('quickSettings', QS_CLASS, 'enable-quick-settings-glass'));
+        this._on('changed::enable-menu-glass', () =>
+            this._applyMenu('dateMenu', MENU_CLASS, 'enable-menu-glass'));
+        this._on('changed::frosted-fallback', () => this._syncSchemeClasses());
+        this._watchColorScheme();
         // Top-bar button, left of Wi-Fi/sound/battery (see _placeIndicator).
         this._syncIndicator();
-        this._indicatorChangedId = this._settings.connect(
-            'changed::show-indicator', () => this._syncIndicator());
-        // TODO: attach Clutter blur clipped to container radius
-        // (sigma/brightness/contrast/saturation from settings).
+        this._on('changed::show-indicator', () => this._syncIndicator());
     }
 
     disable() {
-        if (this._indicatorChangedId && this._settings) {
-            try { this._settings.disconnect(this._indicatorChangedId); } catch { /* gone */ }
-            this._indicatorChangedId = 0;
+        for (const { obj, id } of this._connections) {
+            try { obj.disconnect(id); } catch { /* already gone */ }
         }
+        this._connections = [];
         for (const [actor, cls] of this._tracked) {
             try { actor.remove_style_class_name(cls); } catch { /* already gone */ }
         }
@@ -81,7 +90,18 @@ export default class GenomeFluidGlassExtension extends Extension {
             try { this._indicator.destroy(); } catch { /* already gone */ }
             this._indicator = null;
         }
+        if (this._interfaceSettings) {
+            // Gio.Settings needs no explicit dispose; drop the reference.
+            this._interfaceSettings = null;
+        }
         this._settings = null;
+    }
+
+    _on(signal, callback) {
+        try {
+            const id = this._settings.connect(signal, callback);
+            this._connections.push({ obj: this._settings, id });
+        } catch { /* setting missing — skip, don't crash */ }
     }
 
     _syncIndicator() {
@@ -114,17 +134,115 @@ export default class GenomeFluidGlassExtension extends Extension {
         } catch { /* private layout changed — order stays as inserted */ }
     }
 
-    _tagWhenOpen(indicatorName, cls, settingKey) {
+    _menuActor(indicatorName) {
         try {
             const indicator = Main.panel.statusArea[indicatorName];
             const menu = indicator?.menu;
-            if (!menu || !this._settings.get_boolean(settingKey))
-                return;
-            const actor = menu.actor ?? menu;
-            actor.add_style_class_name(cls);
-            this._tracked.push([actor, cls]);
+            if (!menu) return null;
+            return menu.actor ?? menu;
         } catch {
             // Indicator missing on this shell build — skip, don't crash.
+            return null;
+        }
+    }
+
+    _addClass(actor, cls) {
+        try {
+            if (!actor.has_style_class_name(cls)) {
+                actor.add_style_class_name(cls);
+                this._tracked.push([actor, cls]);
+            }
+        } catch { /* actor gone */ }
+    }
+
+    _removeClass(actor, cls) {
+        try { actor.remove_style_class_name(cls); } catch { /* already gone */ }
+        this._tracked = this._tracked.filter(
+            ([a, c]) => !(a === actor && c === cls));
+    }
+
+    _watchMenu(indicatorName, cls, settingKey) {
+        this._applyMenu(indicatorName, cls, settingKey);
+        // Re-apply on open: cheap, and covers actors built after enable.
+        try {
+            const menu = Main.panel.statusArea[indicatorName]?.menu;
+            if (menu?.connect) {
+                const id = menu.connect('open-state-changed', (_m, open) => {
+                    if (open) this._applyMenu(indicatorName, cls, settingKey);
+                });
+                this._connections.push({ obj: menu, id });
+            }
+        } catch { /* no hookable menu — one-shot tag above stands */ }
+    }
+
+    _applyMenu(indicatorName, cls, settingKey) {
+        const actor = this._menuActor(indicatorName);
+        if (!actor) return;
+        let on = true;
+        try { on = this._settings.get_boolean(settingKey); } catch { /* default on */ }
+        if (on) {
+            this._addClass(actor, cls);
+        } else {
+            this._removeClass(actor, cls);
+            this._removeClass(actor, LIGHT_CLASS);
+            this._removeClass(actor, FROSTED_CLASS);
+            return;
+        }
+        this._syncSchemeClasses();
+    }
+
+    _watchColorScheme() {
+        // St.Settings mirrors the live shell scheme (verified pattern on
+        // GNOME 42+); Gio fallback reads color-scheme directly.
+        try {
+            const stSettings = St.Settings.get();
+            if (stSettings?.connect) {
+                const id = stSettings.connect('notify::color-scheme', () =>
+                    this._syncSchemeClasses());
+                this._connections.push({ obj: stSettings, id });
+            }
+        } catch { /* St path unavailable — Gio below covers it */ }
+        try {
+            this._interfaceSettings = new Gio.Settings({
+                schema_id: 'org.gnome.desktop.interface',
+            });
+            const id = this._interfaceSettings.connect('changed::color-scheme', () =>
+                this._syncSchemeClasses());
+            this._connections.push({ obj: this._interfaceSettings, id });
+        } catch { /* last resort: classes stay as initially synced */ }
+        this._syncSchemeClasses();
+    }
+
+    _isLightScheme() {
+        try {
+            const stSettings = St.Settings.get();
+            const scheme = stSettings?.color_scheme;
+            if (scheme !== undefined && St.ColorScheme !== undefined) {
+                // DEFAULT counts as light (stock GNOME behaviour).
+                return scheme !== St.ColorScheme.PREFER_DARK;
+            }
+        } catch { /* fall through to Gio */ }
+        try {
+            const v = (this._interfaceSettings ?? new Gio.Settings({
+                schema_id: 'org.gnome.desktop.interface',
+            })).get_string('color-scheme');
+            return v !== 'prefer-dark';
+        } catch {
+            return false;
+        }
+    }
+
+    _syncSchemeClasses() {
+        let frosted = false;
+        try { frosted = this._settings.get_boolean('frosted-fallback'); } catch { /* off */ }
+        const light = this._isLightScheme();
+        for (const indicatorName of ['quickSettings', 'dateMenu']) {
+            const actor = this._menuActor(indicatorName);
+            if (!actor) continue;
+            if (light) this._addClass(actor, LIGHT_CLASS);
+            else this._removeClass(actor, LIGHT_CLASS);
+            if (frosted) this._addClass(actor, FROSTED_CLASS);
+            else this._removeClass(actor, FROSTED_CLASS);
         }
     }
 }

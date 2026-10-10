@@ -4,12 +4,26 @@
  * Why one block: every surface reads as the same material.
  * ============================================================ */
 
-/* Container veil (dark variant first; carries white text on any wallpaper).
- * NOTE: St (GNOME Shell CSS) has no var() — these are plain values,
- * listed here once so every surface below stays in one family.
- *   R 26px / inner 14px / veil rgba(24,24,28,0.38) / dock veil rgba(255,255,255,0.06)
- *   rim rgba(255,255,255,0.20) / card 0.08 / hover 0.14
- *   txt 0.95 / txt2 0.66 / txt3 0.40 / accent #E0783C (ON states only) */
+/* TOKENS (St has no var() — plain values repeated below; this comment is
+ * the source of truth. Measured worst-case math in README/scripts:
+ *   result = backdrop x (1-a) + veil x a; body+secondary >= 4.5:1 on
+ *   pure-white (dark glass) / pure-black (light glass) torture backdrops.
+ * DARK set  — veil rgba(20,20,24,0.65): body 5.34:1, secondary 4.66:1.
+ *   container R 26 / cards R 14 / rim rgba(255,255,255,0.20)
+ *   specular inset 0 1px 0 rgba(255,255,255,0.30)
+ *   shadow 0 16px 40px rgba(0,0,0,0.30)
+ *   card fill white 0.08 / hover 0.14 / pressed 0.18
+ *   text white 0.95 / secondary 0.85 / tertiary 0.45 (decorative only)
+ *   divider white 0.08. Accent = system -st-accent-color (+ fg) ONLY.
+ * LIGHT set (.fluid-glass-light on same actor, toggled from color-scheme) —
+ *   veil rgba(255,255,255,0.60): body 5.79:1, secondary 4.53:1.
+ *   card fill black 0.06 / hover 0.10 / pressed 0.14
+ *   text rgba(20,20,24,0.92/0.78/0.40)
+ *   rim white 0.65 + faint dark hairline rgba(0,0,0,0.08) as the FIRST
+ *   box-shadow layer (belongs to shadow, not a second painted edge).
+ * Blur (theme-neutral, dock family) owned by liquid-glass shader:
+ *   menu radius 8 / notification 9, brightness 1.02, contrast 1.08,
+ *   saturation 1.4, tint #241f31. CSS never blurs (no backdrop-filter). */
 
 /* ---------- One surface = one shape = one painter ----------
  * Wrappers paint nothing; only the container paints veil/rim/shadow.
@@ -26,6 +40,29 @@
   background: none !important;
   background-image: none !important;
   border: none !important;
+  box-shadow: none !important;
+}
+
+/* Date-menu wrapper chain: every Yaru layer between the tagged menu actor
+ * and the glass must be transparent. Why: .popup-menu-content paints
+ * Yaru-dark #36363a + #424247 border over our veil (the "opaque black"
+ * container); zeroing it leaves exactly one painter.
+ * Selector check: class names verified in Yaru/Yaru-dark gnome-shell.css;
+ * confirm the live chain in Looking Glass (Alt+F2 -> lg -> picker). */
+.fluid-glass-menu .popup-menu-boxpointer,
+.fluid-glass-menu .popup-menu-content,
+.fluid-glass-menu .datemenu-popover,
+.fluid-glass-menu .datemenu-calendar-column,
+.fluid-glass-menu .datemenu-displays-box,
+.fluid-glass-menu .message-list,
+.fluid-glass-menu .message-view,
+.fluid-glass-menu .message-list-controls,
+.fluid-glass-menu .calendar {
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-color: transparent !important;
   box-shadow: none !important;
 }
 
@@ -98,7 +135,7 @@
   box-shadow: none !important;
 }
 
-/* ---------- QUICK SETTINGS ---------- */
+/* ---------- QUICK SETTINGS (untouched except accent dedupe) ---------- */
 .fluid-glass-qs {
   border-radius: 26px !important;
   background-color: rgba(24, 24, 28, 0.38) !important;
@@ -118,8 +155,8 @@
 .fluid-glass-qs .quick-toggle:hover {
   background-color: rgba(255, 255, 255, 0.14) !important;
 }
-.fluid-glass-qs .quick-toggle:checked { /* accent glass, not flat paint */
-  background-color: rgba(224, 120, 60, 0.55) !important;
+.fluid-glass-qs .quick-toggle:checked { /* system accent glass, never a hardcoded hue */
+  background-color: st-transparentize(-st-accent-color, 0.45) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
 }
 .fluid-glass-qs .quick-toggle .quick-toggle-title {
@@ -143,77 +180,291 @@
   box-shadow: none !important;
 }
 
-/* ---------- CALENDAR / DATE MENU ---------- */
+/* ---------- CALENDAR / DATE MENU (dark set) ---------- */
 .fluid-glass-menu {
   border-radius: 26px !important;
-  background-color: rgba(24, 24, 28, 0.38) !important;
-  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  background-color: rgba(20, 20, 24, 0.65) !important; /* strict-contrast veil: 5.34:1 body on white */
+  border: 1px solid rgba(255, 255, 255, 0.20) !important; /* dock rim */
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30),
-              0 16px 40px rgba(0, 0, 0, 0.30) !important;
+              0 16px 40px rgba(0, 0, 0, 0.30) !important; /* dock specular + depth */
   padding: 14px !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
-.fluid-glass-menu .calendar {
-  background: none !important;
+/* Column divider: 1px hairline, not a hard edge. Why: Yaru paints a solid
+ * 1px border (rgba white 0.1 dark / #222 0.15 light); soften to 0.08. */
+.fluid-glass-menu .message-list {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+/* Notification cards: flat translucent fills on the glass — no own blur,
+ * rim, border or shadow, so alpha never stacks into a seam. */
+.fluid-glass-menu .message {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 14px !important; /* container 26 minus padding */
+  margin-bottom: 8px !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+.fluid-glass-menu .message:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+}
+/* Stack glitch fix: collapsed group layers (:second/:lower-in-stack paint
+ * Yaru-dark #45454a/#3d3d42 slabs) become ONE subtle offset fill in the
+ * same family — never a separate opaque tone. */
+.fluid-glass-menu .message:second-in-stack,
+.fluid-glass-menu .message:lower-in-stack {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  background-image: none !important;
   border: none !important;
   box-shadow: none !important;
 }
-.fluid-glass-menu .calendar-day { /* regular days: text only, no circles */
+/* Card text hierarchy: app/time secondary, title primary, body secondary. */
+.fluid-glass-menu .message .message-header,
+.fluid-glass-menu .message .message-header .message-header-content .event-time,
+.fluid-glass-menu .message .message-box .message-content {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+.fluid-glass-menu .message .message-header .message-header-content .message-source-title,
+.fluid-glass-menu .message .message-box .message-content .message-title,
+.fluid-glass-menu .message-notification-group .message-group-header .message-group-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+/* Expand/close/collapse: small translucent circles, no rims. */
+.fluid-glass-menu .message .message-header .message-expand-button,
+.fluid-glass-menu .message .message-header .message-close-button,
+.fluid-glass-menu .message-notification-group .message-collapse-button {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 999px !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+.fluid-glass-menu .message .message-header .message-expand-button:hover,
+.fluid-glass-menu .message .message-header .message-close-button:hover,
+.fluid-glass-menu .message-notification-group .message-collapse-button:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+/* Calendar grid: same structure, ghost surfaces. Regular days are text
+ * only; other-month days stay secondary (strict floor) and differ by
+ * weight, not by a heavier fill. */
+.fluid-glass-menu .calendar-day {
   background: none !important;
+  background-image: none !important;
   border-color: transparent !important;
   box-shadow: none !important;
   color: rgba(255, 255, 255, 0.95) !important;
 }
+.fluid-glass-menu .calendar-day.calendar-other-month {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: normal !important;
+}
 .fluid-glass-menu .calendar-day:hover {
-  background-color: rgba(255, 255, 255, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  background-image: none !important;
   border-radius: 99px !important;
 }
-.fluid-glass-menu .calendar-today, /* today = ONE accent circle */
+.fluid-glass-menu .calendar-today, /* today = ONE system-accent circle */
 .fluid-glass-menu .calendar-today:hover {
-  background-color: #E0783C !important;
-  color: #fff !important;
+  background-color: -st-accent-color !important;
+  background-image: none !important;
+  color: -st-accent-fg-color !important;
   border-radius: 99px !important;
   border: none !important;
+  box-shadow: none !important;
 }
 .fluid-glass-menu .calendar-day-heading,
 .fluid-glass-menu .calendar-week-number {
   background: none !important; /* no boxes on headings/week numbers */
   border: none !important;
-  color: rgba(255, 255, 255, 0.40) !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+.fluid-glass-menu .calendar-month-header .calendar-month-label {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 .fluid-glass-menu .calendar-month-header .pager-button {
   background: none !important; /* ghost arrows */
+  background-image: none !important;
   border: none !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.85) !important;
 }
+.fluid-glass-menu .calendar-month-header .pager-button:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+}
+/* Today / events / world clocks / Clear: inner-fill cards. */
+.fluid-glass-menu .datemenu-today-button,
 .fluid-glass-menu .events-button,
-.fluid-glass-menu .world-clocks-button,
-.fluid-glass-menu .message {
+.fluid-glass-menu .world-clocks-button {
   background-color: rgba(255, 255, 255, 0.08) !important;
+  background-image: none !important;
   border: none !important;
   box-shadow: none !important;
   border-radius: 14px !important;
-  margin-bottom: 8px !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.fluid-glass-menu .datemenu-today-button:hover,
+.fluid-glass-menu .events-button:hover,
+.fluid-glass-menu .world-clocks-button:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+}
+.fluid-glass-menu .events-button .events-box .events-title,
+.fluid-glass-menu .world-clocks-button .world-clocks-header,
+.fluid-glass-menu .datemenu-today-button .day-label,
+.fluid-glass-menu .datemenu-today-button .date-label {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.fluid-glass-menu .events-button .events-box .events-list .event-placeholder,
+.fluid-glass-menu .events-button .events-box .events-list .event-box .event-time,
+.fluid-glass-menu .world-clocks-button .world-clocks-grid .world-clocks-timezone {
+  color: rgba(255, 255, 255, 0.85) !important; /* "No Events" stays readable */
+}
+.fluid-glass-menu .message-list-controls .message-list-clear-button {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 999px !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.fluid-glass-menu .message-list-controls .message-list-clear-button:hover {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+}
+.fluid-glass-menu .message-list .message-list-placeholder {
+  color: rgba(255, 255, 255, 0.85) !important; /* empty state sits calmly */
+}
+/* Keyboard focus: visible 2px accent ring on every interactive element. */
+.fluid-glass-menu .message:focus,
+.fluid-glass-menu .events-button:focus,
+.fluid-glass-menu .world-clocks-button:focus,
+.fluid-glass-menu .datemenu-today-button:focus,
+.fluid-glass-menu .calendar-day:focus,
+.fluid-glass-menu .calendar-month-header .pager-button:focus,
+.fluid-glass-menu .message-list-controls .message-list-clear-button:focus,
+.fluid-glass-menu .message .message-header .message-expand-button:focus,
+.fluid-glass-menu .message .message-header .message-close-button:focus,
+.fluid-glass-menu .message-notification-group .message-collapse-button:focus {
+  box-shadow: inset 0 0 0 2px st-transparentize(-st-accent-color, 0.5) !important;
 }
 
-/* ---------- BANNERS / OSD ---------- */
+/* ---------- CALENDAR / DATE MENU (light set) ----------
+ * Same structure, flipped tokens. Toggled by .fluid-glass-light from
+ * color-scheme (extension.js). Light veil 0.60: body 5.79:1 on black. */
+.fluid-glass-menu.fluid-glass-light {
+  background-color: rgba(255, 255, 255, 0.60) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important; /* bright rim */
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), /* faint outer hairline (shadow layer) */
+              inset 0 1px 0 rgba(255, 255, 255, 0.65),
+              0 16px 40px rgba(0, 0, 0, 0.18) !important;
+  color: rgba(20, 20, 24, 0.92) !important;
+}
+.fluid-glass-menu.fluid-glass-light .message-list {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+.fluid-glass-menu.fluid-glass-light .message,
+.fluid-glass-menu.fluid-glass-light .datemenu-today-button,
+.fluid-glass-menu.fluid-glass-light .events-button,
+.fluid-glass-menu.fluid-glass-light .world-clocks-button,
+.fluid-glass-menu.fluid-glass-light .calendar-month-header .calendar-month-label,
+.fluid-glass-menu.fluid-glass-light .message-list-controls .message-list-clear-button,
+.fluid-glass-menu.fluid-glass-light .message .message-header .message-expand-button,
+.fluid-glass-menu.fluid-glass-light .message .message-header .message-close-button,
+.fluid-glass-menu.fluid-glass-light .message-notification-group .message-collapse-button {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  color: rgba(20, 20, 24, 0.92) !important;
+}
+.fluid-glass-menu.fluid-glass-light .message:hover,
+.fluid-glass-menu.fluid-glass-light .datemenu-today-button:hover,
+.fluid-glass-menu.fluid-glass-light .events-button:hover,
+.fluid-glass-menu.fluid-glass-light .world-clocks-button:hover,
+.fluid-glass-menu.fluid-glass-light .calendar-day:hover,
+.fluid-glass-menu.fluid-glass-light .calendar-month-header .pager-button:hover,
+.fluid-glass-menu.fluid-glass-light .message-list-controls .message-list-clear-button:hover,
+.fluid-glass-menu.fluid-glass-light .message .message-header .message-expand-button:hover,
+.fluid-glass-menu.fluid-glass-light .message .message-header .message-close-button:hover,
+.fluid-glass-menu.fluid-glass-light .message-notification-group .message-collapse-button:hover {
+  background-color: rgba(0, 0, 0, 0.10) !important;
+}
+.fluid-glass-menu.fluid-glass-light .message:second-in-stack,
+.fluid-glass-menu.fluid-glass-light .message:lower-in-stack {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+.fluid-glass-menu.fluid-glass-light .message .message-header,
+.fluid-glass-menu.fluid-glass-light .message .message-header .message-header-content .event-time,
+.fluid-glass-menu.fluid-glass-light .message .message-box .message-content,
+.fluid-glass-menu.fluid-glass-light .events-button .events-box .events-list .event-placeholder,
+.fluid-glass-menu.fluid-glass-light .events-button .events-box .events-list .event-box .event-time,
+.fluid-glass-menu.fluid-glass-light .world-clocks-button .world-clocks-grid .world-clocks-timezone,
+.fluid-glass-menu.fluid-glass-light .message-list .message-list-placeholder,
+.fluid-glass-menu.fluid-glass-light .calendar-day.calendar-other-month,
+.fluid-glass-menu.fluid-glass-light .calendar-day-heading,
+.fluid-glass-menu.fluid-glass-light .calendar-week-number,
+.fluid-glass-menu.fluid-glass-light .calendar-month-header .pager-button {
+  color: rgba(20, 20, 24, 0.78) !important;
+}
+.fluid-glass-menu.fluid-glass-light .calendar-day {
+  color: rgba(20, 20, 24, 0.92) !important;
+}
+.fluid-glass-menu.fluid-glass-light .calendar-today,
+.fluid-glass-menu.fluid-glass-light .calendar-today:hover {
+  background-color: -st-accent-color !important;
+  color: -st-accent-fg-color !important;
+}
+
+/* ---------- BANNERS / OSD (dark set + light set) ----------
+ * Same glass recipe, radius 22. Blur via liquid-glass notification-glass;
+ * these rules paint veil/rim/fills whenever the class is present. */
 .fluid-glass-banner {
   border-radius: 22px !important;
   max-width: 400px !important; /* narrower than the 510px slab */
   margin-top: 10px !important; /* 10-12px gap under top bar */
-  background-color: rgba(24, 24, 28, 0.38) !important;
+  background-color: rgba(20, 20, 24, 0.65) !important;
   border: 1px solid rgba(255, 255, 255, 0.20) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30),
               0 16px 40px rgba(0, 0, 0, 0.30) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 .fluid-glass-banner .message {
   background: none !important;
+  background-image: none !important;
   border: none !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+.fluid-glass-banner .message .message-header .message-header-content .message-source-title,
+.fluid-glass-banner .message .message-box .message-content .message-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.fluid-glass-banner.fluid-glass-light {
+  background-color: rgba(255, 255, 255, 0.60) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08),
+              inset 0 1px 0 rgba(255, 255, 255, 0.65),
+              0 16px 40px rgba(0, 0, 0, 0.18) !important;
+  color: rgba(20, 20, 24, 0.92) !important;
+}
+.fluid-glass-banner.fluid-glass-light .message {
+  color: rgba(20, 20, 24, 0.78) !important;
+}
+.fluid-glass-banner.fluid-glass-light .message .message-header .message-header-content .message-source-title,
+.fluid-glass-banner.fluid-glass-light .message .message-box .message-content .message-title {
+  color: rgba(20, 20, 24, 0.92) !important;
 }
 
 /* ---------- FROSTED FALLBACK (no shader): honest non-glass ---------- */
 .fluid-glass-frosted.fluid-glass-qs,
 .fluid-glass-frosted.fluid-glass-menu,
 .fluid-glass-frosted.fluid-glass-banner {
-  background-color: rgba(24, 24, 28, 0.72) !important;
+  background-color: rgba(20, 20, 24, 0.82) !important;
+}
+.fluid-glass-frosted.fluid-glass-menu.fluid-glass-light,
+.fluid-glass-frosted.fluid-glass-banner.fluid-glass-light,
+.fluid-glass-frosted.fluid-glass-qs.fluid-glass-light {
+  background-color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* ---------- TOP BAR BUTTON: Fluid Glass icon, left of Quick Settings ----
